@@ -12,6 +12,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const [licensePlate, setLicensePlate] = useState('');
   const [ticketNumber, setTicketNumber] = useState('');
   const [state, setState] = useState('NY');
+  const [borough, setBorough] = useState('');
   const [searchType, setSearchType] = useState<'plate' | 'ticket'>('plate');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,12 +21,14 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
       onSearch({
         licensePlate: licensePlate.trim().toUpperCase(),
         state: state.toUpperCase(),
+        borough: borough,
         limit: 50,
         offset: 0
       });
     } else if (searchType === 'ticket' && ticketNumber.trim()) {
       onSearch({
         ticketNumber: ticketNumber.trim(),
+        borough: borough,
         limit: 50,
         offset: 0
       });
@@ -35,6 +38,15 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
   const states = [
     'NY', 'NJ', 'CT', 'PA', 'FL', 'CA', 'TX', 'MA', 'VA', 'MD',
     'NC', 'GA', 'OH', 'IL', 'MI', 'WA', 'OR', 'AZ', 'CO', 'NV'
+  ];
+
+  const nycBoroughs = [
+    { value: '', label: 'All Boroughs' },
+    { value: 'MANHATTAN', label: 'Manhattan' },
+    { value: 'QUEENS', label: 'Queens' },
+    { value: 'BROOKLYN', label: 'Brooklyn' },
+    { value: 'BRONX', label: 'Bronx' },
+    { value: 'STATEN ISLAND', label: 'Staten Island' }
   ];
 
   return (
@@ -74,59 +86,103 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
         {/* Search Fields */}
         {searchType === 'plate' ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <label htmlFor="licensePlate" className="block text-sm font-semibold text-gray-800 mb-2">
-                License Plate Number
-              </label>
-              <input
-                type="text"
-                id="licensePlate"
-                value={licensePlate}
-                onChange={(e) => setLicensePlate(e.target.value)}
-                placeholder="Enter license plate (e.g., ABC1234)"
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
-                required
-                disabled={isLoading}
-                maxLength={10}
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <label htmlFor="licensePlate" className="block text-sm font-semibold text-gray-800 mb-2">
+                  License Plate Number
+                </label>
+                <input
+                  type="text"
+                  id="licensePlate"
+                  value={licensePlate}
+                  onChange={(e) => setLicensePlate(e.target.value)}
+                  placeholder="Enter license plate (e.g., ABC1234)"
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
+                  required
+                  disabled={isLoading}
+                  maxLength={10}
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="state" className="block text-sm font-semibold text-gray-800 mb-2">
+                  Registration State
+                </label>
+                <select
+                  id="state"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
+                  disabled={isLoading}
+                >
+                  {states.map((stateCode) => (
+                    <option key={stateCode} value={stateCode} className="text-gray-900 font-medium">
+                      {stateCode}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             
+            {/* Borough Filter - Always show for all searches */}
             <div>
-              <label htmlFor="state" className="block text-sm font-semibold text-gray-800 mb-2">
-                Registration State
+              <label htmlFor="borough" className="block text-sm font-semibold text-gray-800 mb-2">
+                🏙️ Filter by NYC Borough (Optional)
               </label>
               <select
-                id="state"
-                value={state}
-                onChange={(e) => setState(e.target.value)}
+                id="borough"
+                value={borough}
+                onChange={(e) => setBorough(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
                 disabled={isLoading}
               >
-                {states.map((stateCode) => (
-                  <option key={stateCode} value={stateCode} className="text-gray-900 font-medium">
-                    {stateCode}
+                {nycBoroughs.map((boroughOption) => (
+                  <option key={boroughOption.value} value={boroughOption.value} className="text-gray-900 font-medium">
+                    {boroughOption.label}
                   </option>
                 ))}
               </select>
             </div>
           </div>
         ) : (
-          <div>
-            <label htmlFor="ticketNumber" className="block text-sm font-semibold text-gray-800 mb-2">
-              Ticket Number (Summons Number)
-            </label>
-            <input
-              type="text"
-              id="ticketNumber"
-              value={ticketNumber}
-              onChange={(e) => setTicketNumber(e.target.value)}
-              placeholder="Enter ticket number (e.g., 1234567890)"
-              className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
-              required
-              disabled={isLoading}
-              maxLength={15}
-            />
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="ticketNumber" className="block text-sm font-semibold text-gray-800 mb-2">
+                Ticket Number (Summons Number)
+              </label>
+              <input
+                type="text"
+                id="ticketNumber"
+                value={ticketNumber}
+                onChange={(e) => setTicketNumber(e.target.value)}
+                placeholder="Enter ticket number (e.g., 1234567890)"
+                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
+                required
+                disabled={isLoading}
+                maxLength={15}
+              />
+            </div>
+            
+            {/* Borough Filter for ticket search too */}
+            <div>
+              <label htmlFor="borough" className="block text-sm font-semibold text-gray-800 mb-2">
+                🏙️ Filter by NYC Borough (Optional)
+              </label>
+              <select
+                id="borough"
+                value={borough}
+                onChange={(e) => setBorough(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
+                disabled={isLoading}
+              >
+                {nycBoroughs.map((boroughOption) => (
+                  <option key={boroughOption.value} value={boroughOption.value} className="text-gray-900 font-medium">
+                    {boroughOption.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
         

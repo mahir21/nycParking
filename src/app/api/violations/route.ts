@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const licensePlate = searchParams.get('licensePlate');
   const ticketNumber = searchParams.get('ticketNumber');
   const state = searchParams.get('state') || 'NY';
+  const borough = searchParams.get('borough');
 
   if (!licensePlate && !ticketNumber) {
     return NextResponse.json(
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     console.log('Raw violations count:', rawViolations.length);
 
     // Map to our expected format
-    const violations: ParkingViolation[] = rawViolations.map((raw: any) => ({
+    let violations: ParkingViolation[] = rawViolations.map((raw: any) => ({
       summons_number: raw.summons_number?.toString() || '',
       plate_id: raw.plate?.toString() || '',
       registration_state: raw.state?.toString() || '',
@@ -63,10 +64,11 @@ export async function GET(request: NextRequest) {
       violation_code: raw.violation?.toString() || '',
       violation_time: raw.violation_time?.toString() || '',
       violation_precinct: raw.precinct?.toString() || '',
+      violation_county: raw.county?.toString() || '',
+      issuing_agency: raw.issuing_agency?.toString() || '',
       // Set empty defaults for fields not in this dataset
       vehicle_body_type: '',
       vehicle_make: '',
-      issuing_agency: '',
       street_code1: '',
       street_code2: '',
       street_code3: '',
@@ -77,7 +79,6 @@ export async function GET(request: NextRequest) {
       issuer_command: '',
       issuer_squad: '',
       time_first_observed: '',
-      violation_county: '',
       violation_in_front_of_or_opposite: '',
       house_number: '',
       street_name: '',
@@ -100,6 +101,28 @@ export async function GET(request: NextRequest) {
       hydrant_violation: '',
       double_parking_violation: ''
     }));
+
+    // Filter by borough if specified
+    if (borough && borough.trim() !== '' && borough.toUpperCase() !== 'ALL BOROUGHS') {
+      violations = violations.filter((violation) => {
+        const county = violation.violation_county?.toUpperCase();
+        const searchBorough = borough.toUpperCase();
+        
+        // Map borough names to county codes as they appear in the NYC Open Data
+        const boroughToCounty: { [key: string]: string[] } = {
+          'MANHATTAN': ['NY', 'MN'],
+          'BROOKLYN': ['K', 'BK'],
+          'QUEENS': ['Q', 'QN', 'QUEENS'],
+          'BRONX': ['BX'],
+          'STATEN ISLAND': ['R', 'ST']
+        };
+        
+        const countyNames = boroughToCounty[searchBorough];
+        return county && countyNames && countyNames.includes(county);
+      });
+      
+      console.log(`Filtered to ${violations.length} violations for ${borough}`);
+    }
 
     const result: ViolationSearchResult = {
       violations,

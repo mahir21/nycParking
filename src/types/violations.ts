@@ -54,6 +54,7 @@ export interface SearchParams {
   licensePlate?: string;
   ticketNumber?: string;
   state?: string;
+  borough?: string;
   limit?: number;
   offset?: number;
 }

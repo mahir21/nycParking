@@ -27,6 +27,10 @@ export default function Home() {
         queryParams.append('ticketNumber', params.ticketNumber);
       }
       
+      if (params.borough) {
+        queryParams.append('borough', params.borough);
+      }
+      
       queryParams.append('limit', (params.limit || 50).toString());
       queryParams.append('offset', (params.offset || 0).toString());
 
