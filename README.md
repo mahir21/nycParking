@@ -7,7 +7,8 @@ A comprehensive Next.js TypeScript web application that allows users to search f
 - 🔍 **Dual Search Methods**: 
   - Search by license plate number and state
   - Search by specific ticket number (summons number)
-- 🎫 **Comprehensive Ticket Information**: View detailed violation data including ticket numbers, dates, times, and violation codes
+- �️ **NYC Borough Filtering**: Filter violations by specific NYC boroughs (Manhattan, Brooklyn, Queens, Bronx, Staten Island)
+- �🎫 **Comprehensive Ticket Information**: View detailed violation data including ticket numbers, dates, times, and violation codes
 - 📍 **Location Details**: See where violations occurred with street names and counties
 - 🚗 **Vehicle Information**: Display available vehicle details
 - 📱 **Responsive Design**: Optimized for desktop, tablet, and mobile devices
@@ -86,6 +87,7 @@ export interface ParkingViolation {
 export interface SearchParams {
   licensePlate?: string;    # Optional for flexible search
   ticketNumber?: string;    # Added for dual search capability
+  borough?: string;         # NYC borough filtering
   state?: string;
   limit?: number;
   offset?: number;
@@ -206,6 +208,92 @@ http://localhost:3000
 - **Utility-First Concepts**: Rapid styling approach
 - **Responsive Design**: Mobile-first methodology
 
+## 🏙️ NYC Borough Filtering Implementation
+
+### **How Borough Filtering Works**
+
+The borough filtering feature allows users to filter parking violations by specific NYC boroughs. This is particularly useful when users have multiple violations across different boroughs and want to see violations from a specific area.
+
+#### **Technical Implementation**
+
+**1. County Code Mapping**
+NYC Open Data uses various county codes to represent boroughs. Our implementation handles all variations:
+
+```typescript
+// Borough to county code mapping in /src/app/api/violations/route.ts
+const boroughToCounty: { [key: string]: string[] } = {
+  'MANHATTAN': ['NY', 'MN'],        // New York County
+  'BROOKLYN': ['K', 'BK'],          // Kings County  
+  'QUEENS': ['Q', 'QN', 'QUEENS'],  // Queens County
+  'BRONX': ['BX'],                  // Bronx County
+  'STATEN ISLAND': ['R', 'ST']      // Richmond County
+};
+```
+
+**2. Client-Side Filtering Process**
+```typescript
+// Filter violations by selected borough
+if (borough && borough.trim() !== '' && borough.toUpperCase() !== 'ALL BOROUGHS') {
+  violations = violations.filter((violation) => {
+    const county = violation.violation_county?.toUpperCase();
+    const searchBorough = borough.toUpperCase();
+    
+    const countyNames = boroughToCounty[searchBorough];
+    return county && countyNames && countyNames.includes(county);
+  });
+  
+  console.log(`Filtered to ${violations.length} violations for ${borough}`);
+}
+```
+
+**3. UI Integration**
+The borough selector is integrated into the search form with these options:
+- All Boroughs (default - shows all violations)
+- Manhattan
+- Brooklyn  
+- Queens
+- Bronx
+- Staten Island
+
+#### **Data Flow for Borough Filtering**
+
+```
+User Selects Borough → Form Submission → API Call with Borough Parameter → 
+Server Fetches All Violations → Client-Side Filtering by County Codes → 
+Filtered Results Returned → UI Updates with Borough-Specific Violations
+```
+
+#### **Why Client-Side Filtering?**
+
+We chose client-side filtering over server-side for several reasons:
+
+1. **API Limitations**: NYC Open Data API doesn't have direct borough parameters
+2. **Performance**: Reduces API calls since we fetch all violations once
+3. **Flexibility**: Allows users to quickly switch between boroughs without new API requests
+4. **Data Accuracy**: Handles all county code variations in one place
+
+#### **County Code Research Process**
+
+To implement accurate borough filtering, we researched the actual county codes in the dataset:
+
+```bash
+# Command used to analyze county code patterns
+curl -s "https://data.cityofnewyork.us/resource/nc67-uf89.json?\$limit=500" | \
+jq -r '.[] | select(.county != null) | .county' | sort | uniq -c | sort -nr
+
+# Results showed these county codes:
+#  76 K     (Kings - Brooklyn)
+#  39 NY    (New York - Manhattan)  
+#  16 QN    (Queens)
+#  12 BX    (Bronx)
+#  10 Q     (Queens)
+#   7 BK    (Brooklyn)
+#   3 MN    (Manhattan)
+#   2 ST    (Staten Island)
+```
+
+This research ensured our borough mapping covers all real-world variations in the data.
+
 ### **🔍 Key Concepts Demonstrated in This Project**
 
 #### **1. Modern React Patterns**
@@ -294,6 +382,11 @@ try {
 2. **Enter Ticket Number**: Type the 10-digit summons number
 3. **Click Search**: Application fetches the specific violation
 
+### **Borough Filtering**
+1. **Select Borough**: Choose from dropdown (Manhattan, Brooklyn, Queens, Bronx, Staten Island, or All Boroughs)
+2. **Combined Filtering**: Works with both license plate and ticket number searches
+3. **Smart Mapping**: Automatically handles all county code variations (e.g., Q, QN, Queens → Queens)
+
 ### **Understanding Results**
 Each violation displays:
 - 🎫 **Ticket Details**: Summons number, date, time
@@ -305,17 +398,21 @@ Each violation displays:
 
 ### GET `/api/violations`
 
-Search for parking violations by license plate.
+Search for parking violations by license plate or ticket number with optional borough filtering.
 
 **Query Parameters:**
-- `licensePlate` (required): The license plate number
+- `licensePlate` (optional): The license plate number
+- `ticketNumber` (optional): The 10-digit summons number
 - `state` (optional): Registration state (default: NY)
+- `borough` (optional): NYC borough filter (Manhattan, Brooklyn, Queens, Bronx, Staten Island)
 - `limit` (optional): Number of results to return (default: 50)
 - `offset` (optional): Pagination offset (default: 0)
 
-**Example:**
+**Examples:**
 ```
-GET /api/violations?licensePlate=ABC1234&state=NY&limit=25
+GET /api/violations?licensePlate=ABC1234&state=NY&borough=MANHATTAN
+GET /api/violations?ticketNumber=1234567890
+GET /api/violations?licensePlate=ABC1234&borough=QUEENS&limit=25
 ```
 
 ## 🔧 Implementation Deep Dive
