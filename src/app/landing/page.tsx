@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function HomePage() {
+export default function LandingPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -19,8 +19,11 @@ export default function HomePage() {
     )
   }
 
-  // Show landing page for everyone initially
-  // Users can manually navigate to /app if they want the main functionality
+  if (session) {
+    // User is logged in, redirect to main app
+    router.push('/app')
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -148,5 +151,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-  );
+  )
 }
