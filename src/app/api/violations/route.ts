@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ParkingViolation, ViolationSearchResult } from '@/types/violations';
 
+const NYC_API_BASE = 'https://data.cityofnewyork.us/resource/nc67-uf89.json';
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const licensePlate = searchParams.get('licensePlate');
   const ticketNumber = searchParams.get('ticketNumber');
   const state = searchParams.get('state') || 'NY';
   const borough = searchParams.get('borough');
+  const limit = searchParams.get('limit') || '50';
+  const offset = searchParams.get('offset') || '0';
+
+  console.log('🔍 Violations API called:', { licensePlate, ticketNumber, state, borough });
 
   if (!licensePlate && !ticketNumber) {
     return NextResponse.json(
@@ -16,43 +22,46 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Build API URL based on search type
-    let apiUrl = '';
-    let searchType = '';
+    // Build NYC Open Data API URL
+    const params = new URLSearchParams();
     
     if (ticketNumber) {
-      // Search by ticket number (summons_number)
-      apiUrl = `https://data.cityofnewyork.us/resource/nc67-uf89.json?summons_number=${ticketNumber}&$limit=50&$order=issue_date DESC`;
-      searchType = 'ticket';
+      params.append('summons_number', ticketNumber);
     } else if (licensePlate) {
-      // Search by license plate
-      apiUrl = `https://data.cityofnewyork.us/resource/nc67-uf89.json?plate=${licensePlate.toUpperCase()}&state=${state.toUpperCase()}&$limit=50&$order=issue_date DESC`;
-      searchType = 'plate';
+      params.append('plate', licensePlate.toUpperCase());
+      params.append('registration_state', state.toUpperCase());
     }
     
-    console.log(`Fetching ${searchType} search from:`, apiUrl);
+    params.append('$limit', limit);
+    params.append('$offset', offset);
+    params.append('$order', 'issue_date DESC');
+
+    const apiUrl = `${NYC_API_BASE}?${params.toString()}`;
+    console.log('📡 Calling NYC API:', apiUrl);
 
     const response = await fetch(apiUrl, {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      }
+      },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error:', response.status, response.statusText, errorText);
+      console.error('❌ NYC API Error:', response.status, response.statusText, errorText);
       return NextResponse.json(
         { 
-          error: 'Failed to fetch violations',
-          details: `API returned ${response.status}: ${errorText}`
+          error: 'Failed to fetch violations from NYC Open Data',
+          details: `NYC API returned ${response.status}`,
+          violations: [],
+          totalCount: 0
         },
         { status: 500 }
       );
     }
 
     const rawViolations = await response.json();
-    console.log('Raw violations count:', rawViolations.length);
+    console.log('✅ Found violations:', rawViolations.length);
 
     // Map to our expected format with safe field access
     let violations: ParkingViolation[] = rawViolations.map((raw: any) => ({
