@@ -54,18 +54,18 @@ export async function GET(request: NextRequest) {
     const rawViolations = await response.json();
     console.log('Raw violations count:', rawViolations.length);
 
-    // Map to our expected format
+    // Map to our expected format with safe field access
     let violations: ParkingViolation[] = rawViolations.map((raw: any) => ({
-      summons_number: raw.summons_number?.toString() || '',
-      plate_id: raw.plate?.toString() || '',
-      registration_state: raw.state?.toString() || '',
-      plate_type: raw.license_type?.toString() || '',
-      issue_date: raw.issue_date?.toString() || '',
-      violation_code: raw.violation?.toString() || '',
-      violation_time: raw.violation_time?.toString() || '',
-      violation_precinct: raw.precinct?.toString() || '',
-      violation_county: raw.county?.toString() || '',
-      issuing_agency: raw.issuing_agency?.toString() || '',
+      summons_number: raw.summons_number?.toString() || raw.summonsNumber?.toString() || '',
+      plate_id: raw.plate_id?.toString() || raw.plate?.toString() || '',
+      registration_state: raw.registration_state?.toString() || raw.state?.toString() || '',
+      plate_type: raw.plate_type?.toString() || raw.license_type?.toString() || '',
+      issue_date: raw.issue_date?.toString() || raw.issueDate?.toString() || '',
+      violation_code: raw.violation_code?.toString() || raw.violation?.toString() || '',
+      violation_time: raw.violation_time?.toString() || raw.violationTime?.toString() || '',
+      violation_precinct: raw.violation_precinct?.toString() || raw.precinct?.toString() || '',
+      violation_county: raw.violation_county?.toString() || raw.county?.toString() || '',
+      issuing_agency: raw.issuing_agency?.toString() || raw.issuingAgency?.toString() || '',
       // Set empty defaults for fields not in this dataset
       vehicle_body_type: '',
       vehicle_make: '',
