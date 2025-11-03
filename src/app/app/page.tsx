@@ -40,14 +40,33 @@ export default function App() {
       queryParams.append('limit', (params.limit || 50).toString());
       queryParams.append('offset', (params.offset || 0).toString());
 
+      console.log('🔍 Fetching violations with params:', queryParams.toString());
       const response = await fetch(`/api/violations?${queryParams}`);
       
+      console.log('📡 API Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch violations');
+        let errorMessage = 'Failed to fetch violations';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          // If JSON parsing fails, use status text
+          errorMessage = `API Error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Check if response is actually JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text();
+        console.error('❌ Expected JSON, got:', contentType, textResponse.substring(0, 200));
+        throw new Error('API returned non-JSON response. Please check your deployment.');
       }
 
       const data: ViolationSearchResult = await response.json();
+      console.log('✅ Received violations:', data.totalCount);
       setSearchResult(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
