@@ -51,7 +51,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
 
   return (
     <div className="bg-white shadow-xl rounded-xl p-8 mb-8 border border-gray-200">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">
+      <h2 className="text-3xl font-bold text-slate-800 mb-6">
         🔍 Search Parking Violations
       </h2>
       
@@ -63,8 +63,8 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             onClick={() => setSearchType('plate')}
             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
               searchType === 'plate'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-sky-500 text-white shadow-lg hover:bg-sky-600'
+                : 'bg-gray-200 text-slate-700 hover:bg-gray-300'
             }`}
             disabled={isLoading}
           >
@@ -75,8 +75,8 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             onClick={() => setSearchType('ticket')}
             className={`px-6 py-3 rounded-lg font-semibold transition-all ${
               searchType === 'ticket'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ? 'bg-sky-500 text-white shadow-lg hover:bg-sky-600'
+                : 'bg-gray-200 text-slate-700 hover:bg-gray-300'
             }`}
             disabled={isLoading}
           >
@@ -89,7 +89,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <label htmlFor="licensePlate" className="block text-sm font-semibold text-gray-800 mb-2">
+                <label htmlFor="licensePlate" className="block text-sm font-semibold text-slate-700 mb-2">
                   License Plate Number
                 </label>
                 <input
@@ -98,7 +98,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                   value={licensePlate}
                   onChange={(e) => setLicensePlate(e.target.value)}
                   placeholder="Enter license plate (e.g., ABC1234)"
-                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-lg font-semibold text-slate-800 bg-white placeholder-slate-400 shadow-sm hover:border-gray-400 transition-colors"
                   required
                   disabled={isLoading}
                   maxLength={10}
@@ -106,18 +106,18 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
               </div>
               
               <div>
-                <label htmlFor="state" className="block text-sm font-semibold text-gray-800 mb-2">
+                <label htmlFor="state" className="block text-sm font-semibold text-slate-700 mb-2">
                   Registration State
                 </label>
                 <select
                   id="state"
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-lg font-semibold text-slate-800 bg-white shadow-sm hover:border-gray-400 transition-colors"
                   disabled={isLoading}
                 >
                   {states.map((stateCode) => (
-                    <option key={stateCode} value={stateCode} className="text-gray-900 font-medium">
+                    <option key={stateCode} value={stateCode} className="text-slate-800 font-medium">
                       {stateCode}
                     </option>
                   ))}
@@ -127,18 +127,18 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             
             {/* Borough Filter - Always show for all searches */}
             <div>
-              <label htmlFor="borough" className="block text-sm font-semibold text-gray-800 mb-2">
+              <label htmlFor="borough" className="block text-sm font-semibold text-slate-700 mb-2">
                 🏙️ Filter by NYC Borough (Optional)
               </label>
               <select
                 id="borough"
                 value={borough}
                 onChange={(e) => setBorough(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-lg font-semibold text-slate-800 bg-white shadow-sm hover:border-gray-400 transition-colors"
                 disabled={isLoading}
               >
                 {nycBoroughs.map((boroughOption) => (
-                  <option key={boroughOption.value} value={boroughOption.value} className="text-gray-900 font-medium">
+                  <option key={boroughOption.value} value={boroughOption.value} className="text-slate-800 font-medium">
                     {boroughOption.label}
                   </option>
                 ))}
@@ -148,7 +148,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         ) : (
           <div className="space-y-4">
             <div>
-              <label htmlFor="ticketNumber" className="block text-sm font-semibold text-gray-800 mb-2">
+              <label htmlFor="ticketNumber" className="block text-sm font-semibold text-slate-700 mb-2">
                 Ticket Number (Summons Number)
               </label>
               <input
@@ -157,7 +157,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
                 value={ticketNumber}
                 onChange={(e) => setTicketNumber(e.target.value)}
                 placeholder="Enter ticket number (e.g., 1234567890)"
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white placeholder-gray-500 shadow-sm hover:border-gray-500 transition-colors"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-lg font-semibold text-slate-800 bg-white placeholder-slate-400 shadow-sm hover:border-gray-400 transition-colors"
                 required
                 disabled={isLoading}
                 maxLength={15}
@@ -166,18 +166,18 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
             
             {/* Borough Filter for ticket search too */}
             <div>
-              <label htmlFor="borough" className="block text-sm font-semibold text-gray-800 mb-2">
+              <label htmlFor="borough" className="block text-sm font-semibold text-slate-700 mb-2">
                 🏙️ Filter by NYC Borough (Optional)
               </label>
               <select
                 id="borough"
                 value={borough}
                 onChange={(e) => setBorough(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-semibold text-gray-900 bg-white shadow-sm hover:border-gray-500 transition-colors"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-lg font-semibold text-slate-800 bg-white shadow-sm hover:border-gray-400 transition-colors"
                 disabled={isLoading}
               >
                 {nycBoroughs.map((boroughOption) => (
-                  <option key={boroughOption.value} value={boroughOption.value} className="text-gray-900 font-medium">
+                  <option key={boroughOption.value} value={boroughOption.value} className="text-slate-800 font-medium">
                     {boroughOption.label}
                   </option>
                 ))}
@@ -189,7 +189,7 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         <button
           type="submit"
           disabled={isLoading || (searchType === 'plate' ? !licensePlate.trim() : !ticketNumber.trim())}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-lg"
+          className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center text-lg"
         >
           {isLoading ? (
             <>
@@ -207,13 +207,13 @@ export default function SearchForm({ onSearch, isLoading }: SearchFormProps) {
         </button>
       </form>
       
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800 font-medium">
+      <div className="mt-6 p-4 bg-sky-50 border border-sky-200 rounded-lg">
+        <p className="text-sm text-sky-800 font-medium">
           <strong>💡 Note:</strong> Search NYC parking violation records by license plate or ticket number. 
           Data may take a few moments to load and includes violations from recent years.
         </p>
         {searchType === 'ticket' && (
-          <p className="text-sm text-blue-700 mt-2">
+          <p className="text-sm text-sky-700 mt-2">
             <strong>Tip:</strong> Ticket numbers are typically 10-digit numbers found on your parking violation summons.
           </p>
         )}

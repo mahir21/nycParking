@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -13,10 +13,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Verify plate belongs to user before deleting
     const plate = await prisma.plateWatch.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id
       }
     })
@@ -26,7 +28,7 @@ export async function DELETE(
     }
 
     await prisma.plateWatch.delete({
-      where: { id: params.id }
+      where: { id: id }
     })
 
     return NextResponse.json({ message: 'Plate removed successfully' })
@@ -38,7 +40,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth()
@@ -48,11 +50,12 @@ export async function PATCH(
     }
 
     const { isActive } = await request.json()
+    const { id } = await params
 
     // Verify plate belongs to user before updating
     const plate = await prisma.plateWatch.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: session.user.id
       }
     })
@@ -62,7 +65,7 @@ export async function PATCH(
     }
 
     const updatedPlate = await prisma.plateWatch.update({
-      where: { id: params.id },
+      where: { id: id },
       data: { isActive }
     })
 

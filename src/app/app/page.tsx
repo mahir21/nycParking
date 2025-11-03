@@ -57,7 +57,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-100">
       <Navigation />
       
       {/* Header */}
@@ -66,23 +66,23 @@ export default function App() {
           <div className="text-center">
             {session && session.user ? (
               <div className="mb-4">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-slate-800">
                   Welcome back, {session.user.firstName || session.user.name || session.user.email || 'User'}! 👋
                 </h1>
-                <p className="mt-2 text-lg text-gray-600">
+                <p className="mt-2 text-lg text-slate-600">
                   Search for parking violations and manage your monitored vehicles
                 </p>
               </div>
             ) : (
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold text-slate-800">
                   NYC Parking Violations Lookup
                 </h1>
-                <p className="mt-2 text-lg text-gray-600">
+                <p className="mt-2 text-lg text-slate-600">
                   Search for parking violations by license plate or ticket number
                 </p>
-                <div className="mt-4 text-sm text-gray-500">
-                  <p>🔓 You can search without an account, or <a href="/auth/signin" className="text-blue-600 hover:underline">sign in</a> for personalized features</p>
+                <div className="mt-4 text-sm text-slate-500">
+                  <p>🔓 You can search without an account, or <a href="/auth/signin" className="text-sky-600 hover:underline">sign in</a> for personalized features</p>
                 </div>
               </div>
             )}
@@ -92,22 +92,22 @@ export default function App() {
 
       {/* Quick Actions for Logged-in Users */}
       {session && session.user && (
-        <div className="bg-blue-50 border-b border-blue-100">
+        <div className="bg-sky-50 border-b border-sky-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between">
-              <div className="text-sm text-blue-800">
+              <div className="text-sm text-sky-800">
                 <span className="font-medium">Logged in as:</span> {session.user.email || 'User'}
               </div>
               <div className="mt-2 sm:mt-0 flex space-x-3">
                 <a
                   href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-sky-700 bg-sky-100 hover:bg-sky-200"
                 >
                   📊 My Dashboard
                 </a>
                 <a
                   href="/dashboard"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200"
                 >
                   + Add Plate to Monitor
                 </a>
@@ -147,9 +147,9 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white border-t border-slate-200 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center text-sm text-slate-500">
             <p>Data provided by NYC Open Data. Real-time parking violation information.</p>
           </div>
         </div>

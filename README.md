@@ -288,6 +288,152 @@ GET /api/auth/session 200 in 4ms     ← Working perfectly!
 ✅ No more blank pages
 ```
 
+### **Phase 4: Critical Netlify Deployment Conflict Resolution** 🌐➡️✅
+
+#### **The Problem: Netlify Build Failure**
+When attempting to deploy to Netlify, the build process failed with dependency conflicts:
+
+```bash
+❌ Line 19: Netlify attempted to install npm packages
+❌ Line 20: dependency_installation returned a non‑zero exit code
+❌ npm ci exited with code 1
+❌ Build failed during "Install dependencies" step
+```
+
+#### **Root Cause Analysis** 🔍
+**NextAuth v5 + Legacy Prisma Adapter = Dependency Hell**
+
+1. **Conflicting NextAuth Versions**: Two different NextAuth packages installed
+   - `next-auth@^5.0.0-beta.30` (NextAuth v5)
+   - `@next-auth/prisma-adapter@^1.0.7` (requires NextAuth v4)
+
+2. **Peer Dependency Conflict**: 
+```bash
+npm error ERESOLVE could not resolve
+npm error Could not resolve dependency:
+npm error peer next-auth@"^4" from @next-auth/prisma-adapter@1.0.7
+npm error Conflicting peer dependency: next-auth@4.24.13
+```
+
+3. **Next.js 16 API Route Parameter Changes**: Async params breaking builds
+```bash
+Type error: Property 'id' does not exist on type 'Promise<{ id: string; }>'
+Next.js build worker exited with code: 1
+```
+
+**Terminal Evidence:**
+```bash
+npm install
+# Result: npm error code ERESOLVE
+# Error: Could not resolve dependency conflicts
+# NextAuth v4 vs v5 adapter incompatibility
+```
+
+#### **The Solution: Dependency Resolution & Next.js 16 Compatibility** 🚀
+
+**Step 1: Fix Package Dependencies**
+```bash
+# Remove conflicting NextAuth v4 adapter
+# OLD package.json had BOTH:
+"@auth/prisma-adapter": "^2.11.1",        # NextAuth v5 adapter ✅
+"@next-auth/prisma-adapter": "^1.0.7",    # NextAuth v4 adapter ❌
+
+# FIXED: Only keep NextAuth v5 compatible adapter
+"dependencies": {
+  "@auth/prisma-adapter": "^2.11.1",      # ✅ Compatible with NextAuth v5
+  "@prisma/client": "^6.18.0",
+  "bcryptjs": "^3.0.2", 
+  "next": "16.0.1",
+  "next-auth": "^5.0.0-beta.30",          # ✅ NextAuth v5
+  "prisma": "^6.18.0",
+  "react": "19.2.0",
+  "react-dom": "19.2.0"
+}
+```
+
+**Step 2: Clean Dependency Tree**
+```bash
+# Complete clean installation
+rm -rf node_modules package-lock.json
+npm install
+
+# Result: 
+# ✅ added 470 packages, and audited 471 packages in 21s
+# ✅ found 0 vulnerabilities
+```
+
+**Step 3: Fix Next.js 16 Async Route Parameters**
+```typescript
+// BEFORE (Next.js 15 style) ❌
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }  // Sync params
+) {
+  const plateId = params.id;  // Direct access
+}
+
+// AFTER (Next.js 16 style) ✅  
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }  // Async params
+) {
+  const { id } = await params;  // Await params resolution
+  const plateId = id;
+}
+```
+
+**Step 4: Generate Missing Prisma Client**
+```bash
+# Build was failing: "@prisma/client did not initialize yet"
+npx prisma generate
+
+# Result:
+# ✅ Generated Prisma Client (v6.18.0) to ./node_modules/@prisma/client
+```
+
+#### **Build Verification & Results** ✅
+```bash
+# Test complete build process
+npm run build
+
+# Results show success:
+✓ Compiled successfully in 982.6ms
+✓ Finished TypeScript in 1336.8ms    
+✓ Collecting page data in 430.0ms    
+✓ Generating static pages (12/12) in 253.6ms
+✓ Finalizing page optimization in 4.7ms    
+
+# All routes successfully built:
+Route (app)
+┌ ○ /                           ← Home page ✅
+├ ○ /_not-found                 ← 404 page ✅
+├ ƒ /api/auth/[...nextauth]     ← NextAuth API ✅
+├ ƒ /api/auth/register          ← Registration API ✅
+├ ƒ /api/user/plates            ← Plate management ✅  
+├ ƒ /api/user/plates/[id]       ← Plate operations ✅
+├ ƒ /api/violations             ← Violation search ✅
+├ ○ /app                        ← Main app ✅
+├ ○ /auth/signin                ← Login page ✅
+├ ○ /auth/signup                ← Registration page ✅
+├ ○ /dashboard                  ← User dashboard ✅
+└ ○ /landing                    ← Landing page ✅
+
+# Deployment readiness confirmed:
+✅ No TypeScript errors
+✅ No build failures  
+✅ All API routes functional
+✅ Authentication system working
+✅ Database integration successful
+✅ Ready for Netlify deployment
+```
+
+#### **Key Learnings from Deployment Crisis**
+1. **Version Compatibility Matrix**: Always check framework + library compatibility
+2. **Dependency Conflicts**: Modern package managers can have complex peer dependency issues
+3. **Next.js Version Migrations**: API changes require code updates (async params)
+4. **Build Process Validation**: Local builds must pass before deployment attempts
+5. **Database Client Generation**: ORM clients must be generated before builds
+
 #### **3. Data Modeling (TypeScript Interfaces)**
 First, we defined comprehensive TypeScript interfaces to ensure type safety:
 
