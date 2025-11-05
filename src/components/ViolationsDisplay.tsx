@@ -73,18 +73,26 @@ export default function ViolationsDisplay({ searchResult, isLoading, error }: Vi
   };
 
   const formatTime = (timeStr: string) => {
-    if (!timeStr || timeStr.length < 4) return timeStr;
+    console.log('Raw time:', timeStr, 'Type:', typeof timeStr);
+    if (!timeStr) return timeStr;
+    
+    // Remove any non-digit characters and pad to 4 digits
+    const cleanTime = timeStr.replace(/\D/g, '').padStart(4, '0');
+    console.log('Cleaned time:', cleanTime);
+    
+    if (cleanTime.length < 4) return timeStr;
     
     // Format time from HHMM to HH:MM AM/PM
-    const hours = parseInt(timeStr.substring(0, 2));
-    const minutes = timeStr.substring(2, 4);
+    const hours = parseInt(cleanTime.substring(0, 2));
+    const minutes = cleanTime.substring(2, 4);
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
     
-    return `${displayHours}:${minutes} ${ampm}`;
-  };
-
-  return (
+    const formatted = `${displayHours}:${minutes} ${ampm}`;
+    console.log('Formatted time:', formatted);
+    
+    return formatted;
+  };  return (
     <div className="bg-white shadow-lg rounded-lg p-6">
       <div className="mb-6">
         <h3 className="text-2xl font-bold text-gray-800">
